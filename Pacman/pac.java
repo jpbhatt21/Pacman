@@ -186,6 +186,7 @@ public class pac extends JFrame implements KeyListener {
 	{
 		System.out.println(s);
 	}
+	
 	void reset()
 	{
 		
@@ -205,7 +206,7 @@ public class pac extends JFrame implements KeyListener {
 		
 		switch(keyInp)
 		{
-			case 37:
+			case 65:
 			if(Grid[pgLoc[0]][(xGrid+pgLoc[1]-1)%xGrid]!=-2 && Grid[pgLoc[0]][(xGrid+pgLoc[1]-1)%xGrid]!=valGhost )
 			{
 				Grid[pgLoc[0]][pgLoc[1]]=9999;
@@ -213,7 +214,7 @@ public class pac extends JFrame implements KeyListener {
 			}
 			break;
 			
-			case 38:
+			case 87:
 			if(Grid[pgLoc[0]-1][pgLoc[1]]!=-2 && Grid[pgLoc[0]-1][pgLoc[1]]!=valGhost )
 			{
 				Grid[pgLoc[0]][pgLoc[1]]=9999;
@@ -221,7 +222,7 @@ public class pac extends JFrame implements KeyListener {
 			}
 			break;
 			
-			case 39:
+			case 68:
 			if(Grid[pgLoc[0]][(pgLoc[1]+1)%xGrid]!=-2 && Grid[pgLoc[0]][(pgLoc[1]+1)%xGrid]!=valGhost )
 			{
 				Grid[pgLoc[0]][pgLoc[1]]=9999;
@@ -229,7 +230,7 @@ public class pac extends JFrame implements KeyListener {
 			}
 			break;
 			
-			case 40:
+			case 83:
 			if(Grid[pgLoc[0]+1][pgLoc[1]]!=-2 && Grid[pgLoc[0]+1][pgLoc[1]]!=valGhost )
 			{
 				Grid[pgLoc[0]][pgLoc[1]]=9999;

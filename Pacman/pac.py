@@ -4,16 +4,16 @@ import time
 from random import randint
 import math
 
-map = 2
+map = 1
 fps=60
-showDistGrid = 1
+showDistGrid = 0
 Ghost1 = 1
-Ghost2 = 0
+Ghost2 = 1
 blocker = 0
-showPath = 1
-follow = 0
+showPath =1
+follow = 1
 global caught
-caught=[-127,0]
+caught=[0,0]
 time_clk=0
 
 
