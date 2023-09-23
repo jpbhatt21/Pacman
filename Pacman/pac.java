@@ -12,6 +12,7 @@ public class pac extends JFrame implements KeyListener {
     int caught = 0;
 	int keyInp=0;
 	int pgLoc[] = new int[4];
+	int timer=0;
     int[][] Grid = {{-2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2},
             {-2, 10, 11, 12, 11, 10, 9, 8, 7, 9000, 8, 9, 10, 11, 12, 13, 12, 11, -2}, {-2, 9, -2, -2, -2, -2, -2, -2, 6, -2, 7, -2, -2, -2, -2, -2, -2, 10, -2},
             {-2, 8, 7, 6, 5, -2, 3, 4, 5, -2, 6, 5, 4, -2, 6, 7, 8, 9, -2}, {-2, -2, 8, -2, 4, -2, 2, -2, -2, -2, -2, -2, 3, -2, 5, -2, 9, -2, -2},
@@ -76,7 +77,7 @@ public class pac extends JFrame implements KeyListener {
 		int y=pgLoc[0];
 		int yGhost=pgLoc[2];
 		int xGhost=pgLoc[3];
-		while(dist>0)
+		while(dist>0 && timer%12==0)
 		{
 			if (Grid[y][(xGrid+x - 1)%xGrid] == dist)
 				x = (xGrid+x - 1)%xGrid;			
@@ -207,7 +208,7 @@ public class pac extends JFrame implements KeyListener {
 		switch(keyInp)
 		{
 			case 65:
-			if(Grid[pgLoc[0]][(xGrid+pgLoc[1]-1)%xGrid]!=-2 && Grid[pgLoc[0]][(xGrid+pgLoc[1]-1)%xGrid]!=valGhost )
+			if(Grid[pgLoc[0]][(xGrid+pgLoc[1]-1)%xGrid]!=-2 && Grid[pgLoc[0]][(xGrid+pgLoc[1]-1)%xGrid]!=valGhost && timer%10==0)
 			{
 				Grid[pgLoc[0]][pgLoc[1]]=9999;
 				Grid[pgLoc[0]][(xGrid+pgLoc[1]-1)%xGrid]=valPlayer;				 
@@ -215,7 +216,7 @@ public class pac extends JFrame implements KeyListener {
 			break;
 			
 			case 87:
-			if(Grid[pgLoc[0]-1][pgLoc[1]]!=-2 && Grid[pgLoc[0]-1][pgLoc[1]]!=valGhost )
+			if(Grid[pgLoc[0]-1][pgLoc[1]]!=-2 && Grid[pgLoc[0]-1][pgLoc[1]]!=valGhost && timer%10==0)
 			{
 				Grid[pgLoc[0]][pgLoc[1]]=9999;
 				Grid[pgLoc[0]-1][pgLoc[1]]=valPlayer;				 
@@ -223,7 +224,7 @@ public class pac extends JFrame implements KeyListener {
 			break;
 			
 			case 68:
-			if(Grid[pgLoc[0]][(pgLoc[1]+1)%xGrid]!=-2 && Grid[pgLoc[0]][(pgLoc[1]+1)%xGrid]!=valGhost )
+			if(Grid[pgLoc[0]][(pgLoc[1]+1)%xGrid]!=-2 && Grid[pgLoc[0]][(pgLoc[1]+1)%xGrid]!=valGhost && timer%10==0)
 			{
 				Grid[pgLoc[0]][pgLoc[1]]=9999;
 				Grid[pgLoc[0]][(pgLoc[1]+1)%xGrid]=valPlayer;
@@ -231,7 +232,7 @@ public class pac extends JFrame implements KeyListener {
 			break;
 			
 			case 83:
-			if(Grid[pgLoc[0]+1][pgLoc[1]]!=-2 && Grid[pgLoc[0]+1][pgLoc[1]]!=valGhost )
+			if(Grid[pgLoc[0]+1][pgLoc[1]]!=-2 && Grid[pgLoc[0]+1][pgLoc[1]]!=valGhost && timer%10==0)
 			{
 				Grid[pgLoc[0]][pgLoc[1]]=9999;
 				Grid[pgLoc[0]+1][pgLoc[1]]=valPlayer;
@@ -252,9 +253,13 @@ public class pac extends JFrame implements KeyListener {
 			pgLoc = printer(0);
 			System.out.println("\033[H");
 			playerMovement();
-			//pathFinder();
+			pathFinder();
+			if (timer<60)
+				timer+=1;
+			else
+				timer=1;
 			pgLoc = printer(1);
-			Thread.sleep(100);
+			Thread.sleep(10);
 			
         }
 		System.out.println("\033[H\033[2J");
@@ -265,7 +270,8 @@ public class pac extends JFrame implements KeyListener {
 	{
 		this.setVisible(true) ;
 		this.addKeyListener(this);
-		gameLogic();		
+		gameLogic();	
+		dispose();
 	}
 	
 	public static void main(String args[])  throws InterruptedException
