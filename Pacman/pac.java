@@ -1,14 +1,17 @@
-import java.io.*;
 import java.lang.Thread;
+import java.lang.Math;
+import java.awt.event.*;
+import javax.swing.*;
 
-public class pac {
+public class pac extends JFrame implements KeyListener {
 
-    static int xGrid = 19;
-    static int yGrid = 25;
-    static int valPlayer = 9000;
-    static int valGhost = 0;
-    static int caught = 0;
-    static int[][] Grid = {{-2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2},
+    int xGrid = 19;
+    int yGrid = 25;
+    int valPlayer = 9000;
+    int valGhost = 0;
+    int caught = 0;
+	int keyInp=0;
+    int[][] Grid = {{-2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2},
             {-2, 10, 11, 12, 11, 10, 9, 8, 7, 9000, 8, 9, 10, 11, 12, 13, 12, 11, -2}, {-2, 9, -2, -2, -2, -2, -2, -2, 6, -2, 7, -2, -2, -2, -2, -2, -2, 10, -2},
             {-2, 8, 7, 6, 5, -2, 3, 4, 5, -2, 6, 5, 4, -2, 6, 7, 8, 9, -2}, {-2, -2, 8, -2, 4, -2, 2, -2, -2, -2, -2, -2, 3, -2, 5, -2, 9, -2, -2},
             {-2, 7, 8, -2, 3, 2, 1, 1, 1, 1, 1, 1, 2, 3, 4, -2, 8, 7, -2}, {-2, 6, -2, -2, 3, -2, -2, -2, 1, -2, 2, -2, -2, -2, 3, -2, -2, 6, -2},
@@ -28,7 +31,7 @@ public class pac {
             {-2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2}
     };
 
-    static int[] printer(int printx) throws InterruptedException {
+    int[] printer(int printx) throws InterruptedException {
 
         int arx[] = new int[4];
 
@@ -62,7 +65,7 @@ public class pac {
         return (arx);
     }
 	
-	static void grn(int dist, int arx[],int nx) throws InterruptedException
+	void reTrace(int dist, int arx[],int nx) throws InterruptedException
 	{
 		if (dist==0)
 			caught=1;
@@ -91,12 +94,12 @@ public class pac {
 			
 			else if (y < yGrid - 1 && Grid[(y + 1) % yGrid][x] == dist)
 				y = (y + 1) % yGrid;
+			
 			if (dist <2   && ((Math.abs(yGhost - y) + 1) % xGrid < 3 && (Math.abs(xGhost - x) + 1) % xGrid < 3))
 			{
 				Grid[yGhost][xGhost] = 9999;
 				yGhost = y;
 				xGhost = x;
-				
 				Grid[yGhost][xGhost] = valGhost;
 				
 			}
@@ -108,7 +111,7 @@ public class pac {
 		}
 	}
 	
-	static void path(int arx[],int nx)  throws InterruptedException
+	void pathFinder(int arx[],int nx)  throws InterruptedException
 	{
 		boolean run = true;
 		
@@ -119,7 +122,7 @@ public class pac {
 		while(run)
 		{
 			int counter = 0;
-			while (counter < (19 * 25)) 	 	 
+			while (counter < (xGrid * yGrid)) 	 	 
 			{
 				int y2 = (counter / xGrid);
 				int x2 = counter % xGrid;
@@ -180,26 +183,15 @@ public class pac {
 		
 		
 		if(found==1)
-			grn( dist-1,arx,nx);
+			reTrace( dist-1,arx,nx);
 		
 	}
-	static void print(String s)
+	
+	void print(String s)
 	{
 		System.out.println(s);
 	}
-	static void print(int s)
-	{
-		System.out.println(s);
-	}
-	static void print(int[] s)
-	{
-		System.out.println(s);
-	}
-	static void print()
-	{
-		System.out.println();
-	}
-	static public void reset()
+	public void reset()
 	{
 		
 		for(int i=0;i<25;i++)
@@ -214,8 +206,8 @@ public class pac {
 	}
 
 
-    public static void main(String args[]) throws InterruptedException {
-		print();
+    void gameLogic() throws InterruptedException {
+		print("");
 		System.out.println("\033[H\033[2J");
         int arx[] = new int[4];
         while (caught==0) {
@@ -223,12 +215,42 @@ public class pac {
 			arx = printer(0);
 			Thread.sleep(100);
 			System.out.println("\033[H");
-			path(arx,1);
+			pathFinder(arx,1);
 			arx = printer(1);
+			
         }
 		System.out.println("\033[H\033[2J");
 		arx=printer(1);
-
     }
+	pac() throws InterruptedException
+	{
+		this.setVisible(true) ;
+		this.addKeyListener(this);
+		gameLogic();
+		
+		
+	}
+	
+	public static void main(String args[]) throws InterruptedException
+	{
+		new pac();
+	}
+	
+	@Override
+	public void keyTyped(KeyEvent e) 
+	{
+	
+	}
+	@Override
+	public void keyPressed(KeyEvent e) 
+	{
+		keyInp=e.getKeyCode();	
+		//print("" +keyInp);	
+	}
+	@Override
+	public void keyReleased(KeyEvent e) 
+	{
+	
+	}
 }
 
