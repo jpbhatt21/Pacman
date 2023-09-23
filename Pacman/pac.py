@@ -1,21 +1,28 @@
 import os
 import pygame
 import time
-
 from random import randint
 import math
 
-map = 1
+map = 2
 fps=60
-showDistGrid = 0
+showDistGrid = 1
 Ghost1 = 1
-Ghost2 = 1
+Ghost2 = 0
 blocker = 0
-showPath = 0
-follow = 1
+showPath = 1
+follow = 0
+global caught
+caught=[-127,0]
+time_clk=0
 
-xGrid = 19  # 19
-yGrid = 25  # 25
+
+if map!=0:
+    xGrid =19
+    yGrid = 25
+else:
+    xGrid = 39  # 19
+    yGrid = 25  # 25
 height = yGrid * 40
 width = xGrid * 40
 valPlayer = 9998
@@ -42,6 +49,8 @@ if map == 1:
         [-2,9999,-2,-2,-2,-2,-2,-2,9999,-2,9999,-2,-2,-2,-2,-2,-2,15,-2],
         [-2,9999,9999,9999,9999,9999,9999,9999,9999,9999,9999,9999,9999,9999,9999,9999,9999,9999,-2],
         [-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2]]
+elif map == 2:
+    Current_Grid = [[-2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2], [-2, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, -2], [-2, 9999, 9999, -2, 9999, 9999, 9999, -2, -2, -2, -2, -2, 9999, -2, 9999, 9999, 9999, 9999, -2], [-2, 9999, -2, -2, -2, 9999, 9999, -2, 9999, 9999, 9999, -2, 9999, -2, 9999, -2, 9999, 9999, -2], [9999, 9999, 9999, -2, 9999, 9999, 9999, -2, 9999, 9999, 9999, -2, 9999, 9999, 9999, -2, 9999, 9999, 9999], [9999, 9999, 9999, 9999, 9999, 9999, 9999, -2, 9999, 9999, 9999, -2, 9999, 9999, 9999, -2, 9999, 9999, 9999], [-2, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, -2, 9999, -2, 9999, 9999, -2], [-2, 9999, 9999, -2, 9999, 9999, 9999, -2, 9999, 9999, 9999, 9999, 9999, -2, 9999, -2, 9999, -2, -2], [9999, 9999, 9999, -2, 9999, -2, -2, -2, 9999, 9999, -2, -2, -2, -2, -2, -2, 9999, 9999, -2], [9999, 9999, 9999, -2, 9999, -2, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, -2, 9999, 9999, 9999], [-2, 9999, 9999, -2, 9999, -2, 9999, -2, -2, -2, -2, -2, 9999, 9999, 9999, -2, 9999, 9999, 9999, -2], [-2, 9999, 9999, 9999, 9999, 9999, 9999, -2, 9999, 1, 9999, -2, 9999, 9999, 9999, -2, 9999, 9999, -2], [-2, -2, -2, -2, -2, 9999, 9999, 9999, 1, 0, 9998, 9999, 9999, -2, 9999, -2, -2, 9999, -2], [-2, 9999, 9999, 9999, 9999, 9999, 9999, -2, 9999, 1, 9999, -2, 9999, -2, 9999, -2, 9999, 9999, -2], [-2, 9999, 9999, 9999, -2, 9999, 9999, -2, -2, -2, -2, -2, 9999, -2, 9999, -2, 9999, 9999, -2, -2], [9999, 9999, -2, -2, -2, -2, 9999, 9999, 9999, -2, 9999, 9999, 9999, -2, 9999, -2, 9999, 9999, 9999], [-2, 9999, -2, 9999, 9999, 9999, 9999, 9999, 9999, -2, 9999, 9999, 9999, 9999, 9999, -2, 9999, 9999, -2], [-2, 9999, 9999, 9999, 9999, -2, 9999, -2, -2, -2, -2, -2, 9999, 9999, 9999, -2, 9999, 9999, -2], [-2, -2, -2, 9999, 9999, -2, 9999, -2, 9999, 9999, 9999, -2, 9999, 9999, 9999, -2, 9999, 9999, -2], [9999, 9999, 9999, 9999, 9999, -2, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, -2, 9999, 9999, 9999], [9999, 9999, 9999, 9999, -2, -2, 9999, -2, -2, 9999, -2, -2, 9999, -2, -2, -2, 9999, 9999, 9999], [-2, 9999, 9999, -2, -2, -2, 9999, -2, 9999, 9999, 9999, -2, 9999, 9999, 9999, -2, -2, -2, -2], [9999, 9999, 9999, 9999, 9999, 9999, 9999, -2, 9999, -2, 9999, -2, 9999, 9999, 9999, 9999, 9999, -2, 9999], [9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, -2, 9999, 9999, 9999], [-2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2]]
 
 y = 0
 if blocker > 0:
@@ -65,20 +74,19 @@ while counter < (xGrid * yGrid):
         Current_Grid[x][y] = 9999
     counter += 1
 
-xPlayerStart = 17
+xPlayerStart = xGrid//2
 yPlayerStart = 1
 
-xGhost1Start = 2
-yGhost1Start = 19
+xGhost1Start = xGrid//2
+yGhost1Start = yGrid//2
 
-xGhost2Start = 2
-yGhost2Start = 12
+xGhost2Start = xGrid//2-1
+yGhost2Start = yGrid//2
 
 Current_Grid[yGhost1Start][xGhost1Start] = 0
 Current_Grid[yGhost2Start][xGhost2Start] = 9999 - Ghost2 * 10000
 Current_Grid[yPlayerStart][xPlayerStart] = valPlayer
-global caught
-caught=[0,0]
+
 follow2 = 0
 if follow == 0:
     follow2 = 1
@@ -111,11 +119,13 @@ def main():
 
     def grn(dist,yGhost,xGhost,moveGh0st,valGhost):
         global caught
-        if caught[valGhost*-1]<30 and dist==0:
+        if caught[valGhost*-1]==-127:
+            caught[valGhost*-1]=-127
+        elif caught[valGhost*-1]<30 and dist==0:
             caught[valGhost*-1]+=1
         elif dist>0:
             caught[valGhost*-1]=0
-        print (caught[valGhost*-1])
+
 
 
         if showDistGrid == 1:
@@ -150,7 +160,7 @@ def main():
                 y = (y + 1) % yGrid
 
             if showPath == 1:
-                pygame.draw.rect(w,(70,170,60),(x * widthBlock,y * widthBlock,widthBlock,widthBlock))
+                pygame.draw.rect(w,(70,170-(valGhost*-1*30),60),(x * widthBlock,y * widthBlock,widthBlock,widthBlock))
 
             if showDistGrid == 1 and showPath == 1:
                 text = font.render(str(dist),True,(90,90,170))
@@ -383,7 +393,19 @@ def main():
     pv = 1
     movePlayer = 0
     tic = 0
+
+    time_clk=0
+    global Ghost2
+    gh2 = Ghost2
+    Ghost2=0
+
     while run:
+
+        if time_clk<180:
+            time_clk += 1
+            ticker = (ticker + 1) % 40 * follow + follow2
+        elif gh2==1:
+            Ghost2=1
         res()
 
         ticker = (ticker + 1) % 40 * follow + follow2
@@ -519,6 +541,7 @@ def main():
 
             if keypress[pygame.K_ESCAPE] or event.type == pygame.QUIT or caught[0]>29 or caught[1]>29:
                 run = False
+
         path(mov3Ghost)
         pygame.display.update()
 
