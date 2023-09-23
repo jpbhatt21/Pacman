@@ -11,6 +11,7 @@ public class pac extends JFrame implements KeyListener {
     int valGhost = 0;
     int caught = 0;
 	int keyInp=0;
+	int pgLoc[] = new int[4];
     int[][] Grid = {{-2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2},
             {-2, 10, 11, 12, 11, 10, 9, 8, 7, 9000, 8, 9, 10, 11, 12, 13, 12, 11, -2}, {-2, 9, -2, -2, -2, -2, -2, -2, 6, -2, 7, -2, -2, -2, -2, -2, -2, 10, -2},
             {-2, 8, 7, 6, 5, -2, 3, 4, 5, -2, 6, 5, 4, -2, 6, 7, 8, 9, -2}, {-2, -2, 8, -2, 4, -2, 2, -2, -2, -2, -2, -2, 3, -2, 5, -2, 9, -2, -2},
@@ -31,9 +32,9 @@ public class pac extends JFrame implements KeyListener {
             {-2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2}
     };
 
-    int[] printer(int printx) throws InterruptedException {
+    int[] printer(int printx){
 
-        int arx[] = new int[4];
+        int pgLoc[] = new int[4];
 
         for (int i = 0; i < yGrid; i++) {
 
@@ -45,13 +46,13 @@ public class pac extends JFrame implements KeyListener {
 
                 if (Grid[i][j] == valPlayer) {
                     s = "▓▓";
-                    arx[0] = i;
-                    arx[1] = j;
+                    pgLoc[0] = i;
+                    pgLoc[1] = j;
 
                 } else if (Grid[i][j] == valGhost) {
                     s = "[]";
-                    arx[2] = i;
-                    arx[3] = j;
+                    pgLoc[2] = i;
+                    pgLoc[3] = j;
                 }
 
                 if (printx == 1)
@@ -62,19 +63,19 @@ public class pac extends JFrame implements KeyListener {
                 System.out.print("\n");
             }
         }
-        return (arx);
+        return (pgLoc);
     }
 	
-	void reTrace(int dist, int arx[],int nx) throws InterruptedException
+	void reTrace(int dist)
 	{
 		if (dist==0)
 			caught=1;
 		
 		
-		int x=arx[1];
-		int y=arx[0];
-		int yGhost=arx[2];
-		int xGhost=arx[3];
+		int x=pgLoc[1];
+		int y=pgLoc[0];
+		int yGhost=pgLoc[2];
+		int xGhost=pgLoc[3];
 		while(dist>0)
 		{
 			if ( x> 0 && Grid[y][x - 1] == dist)
@@ -111,14 +112,14 @@ public class pac extends JFrame implements KeyListener {
 		}
 	}
 	
-	void pathFinder(int arx[],int nx)  throws InterruptedException
+	void pathFinder()
 	{
 		boolean run = true;
 		
 		int dist=0;
 		int found=0;
-		int y=arx[0];
-		int x=arx[1];
+		int y=pgLoc[0];
+		int x=pgLoc[1];
 		while(run)
 		{
 			int counter = 0;
@@ -183,7 +184,7 @@ public class pac extends JFrame implements KeyListener {
 		
 		
 		if(found==1)
-			reTrace( dist-1,arx,nx);
+			reTrace(dist-1);
 		
 	}
 	
@@ -191,7 +192,7 @@ public class pac extends JFrame implements KeyListener {
 	{
 		System.out.println(s);
 	}
-	public void reset()
+	void reset()
 	{
 		
 		for(int i=0;i<25;i++)
@@ -204,34 +205,80 @@ public class pac extends JFrame implements KeyListener {
 			}
 		}
 	}
+	
+	void playerMovement()
+	{
+		
+		switch(keyInp)
+		{
+			case 37:
+			if(pgLoc[1]!=0 && Grid[pgLoc[0]][pgLoc[1]-1]!=-2 && Grid[pgLoc[0]][pgLoc[1]-1]!=valGhost )
+			{
+				Grid[pgLoc[0]][pgLoc[1]]=9999;
+				Grid[pgLoc[0]][pgLoc[1]-1]=valPlayer;				 
+			}
+			else if(pgLoc[1]==0 && Grid[pgLoc[0]][xGrid-1]!=-2 && Grid[pgLoc[0]][xGrid-1]!=valGhost )
+			{
+				Grid[pgLoc[0]][pgLoc[1]]=9999;
+				Grid[pgLoc[0]][xGrid-1]=valPlayer;				 
+			}
+			break;
+			
+			case 38:
+			if(Grid[pgLoc[0]-1][pgLoc[1]]!=-2 && Grid[pgLoc[0]-1][pgLoc[1]]!=valGhost )
+			{
+				Grid[pgLoc[0]][pgLoc[1]]=9999;
+				Grid[pgLoc[0]-1][pgLoc[1]]=valPlayer;				 
+			}
+			break;
+			
+			case 39:
+			if(Grid[pgLoc[0]][(pgLoc[1]+1)%xGrid]!=-2 && Grid[pgLoc[0]][(pgLoc[1]+1)%xGrid]!=valGhost )
+			{
+				Grid[pgLoc[0]][pgLoc[1]]=9999;
+				Grid[pgLoc[0]][(pgLoc[1]+1)%xGrid]=valPlayer;
+			}
+			break;
+			
+			case 40:
+			if(Grid[pgLoc[0]+1][pgLoc[1]]!=-2 && Grid[pgLoc[0]+1][pgLoc[1]]!=valGhost )
+			{
+				Grid[pgLoc[0]][pgLoc[1]]=9999;
+				Grid[pgLoc[0]+1][pgLoc[1]]=valPlayer;
+			 
+			}
+		}
+		
+	}
 
 
-    void gameLogic() throws InterruptedException {
+    void gameLogic() throws InterruptedException
+	{
 		print("");
 		System.out.println("\033[H\033[2J");
-        int arx[] = new int[4];
         while (caught==0) {
+			
 			reset();
-			arx = printer(0);
-			Thread.sleep(100);
+			pgLoc = printer(0);
 			System.out.println("\033[H");
-			pathFinder(arx,1);
-			arx = printer(1);
+			playerMovement();
+			pathFinder();
+			pgLoc = printer(1);
+			Thread.sleep(100);
 			
         }
 		System.out.println("\033[H\033[2J");
-		arx=printer(1);
+		pgLoc=printer(1);
     }
-	pac() throws InterruptedException
+	
+	pac()  throws InterruptedException
 	{
 		this.setVisible(true) ;
 		this.addKeyListener(this);
-		gameLogic();
-		
-		
+		gameLogic();		
 	}
 	
-	public static void main(String args[]) throws InterruptedException
+	public static void main(String args[])  throws InterruptedException
 	{
 		new pac();
 	}
