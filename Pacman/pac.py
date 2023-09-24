@@ -11,9 +11,9 @@ Ghost1 = 1
 Ghost2 = 0
 blocker = 0
 showPath =0
-follow = 0
+follow = 1
 global caught
-caught=[-127,0]
+caught=[0,0]
 time_clk=0
 
 
@@ -385,6 +385,7 @@ def main():
             if Current_Grid[y][x] > 0 and Current_Grid[y][x] < valPlayer:
                 Current_Grid[y][x] = 9999
             counter += 1
+        print(Current_Grid)
 
     click = 0
     pr = 0
@@ -540,12 +541,14 @@ def main():
                 movePlayer = 0
 
             if keypress[pygame.K_ESCAPE] or event.type == pygame.QUIT or caught[0]>29 or caught[1]>29:
+                
                 run = False
 
         path(mov3Ghost)
         pygame.display.update()
-
+	
 
 main()
+
 print(Current_Grid)
 pygame.quit()
