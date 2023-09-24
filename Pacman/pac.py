@@ -8,12 +8,12 @@ map = 1
 fps=60
 showDistGrid = 0
 Ghost1 = 1
-Ghost2 = 1
+Ghost2 = 0
 blocker = 0
-showPath =1
-follow = 1
+showPath =0
+follow = 0
 global caught
-caught=[0,0]
+caught=[-127,0]
 time_clk=0
 
 
