@@ -8,7 +8,7 @@ map = 1
 fps=60
 showDistGrid = 0
 Ghost1 = 1
-Ghost2 = 0
+Ghost2 = 1 
 blocker = 0
 showPath =0
 follow = 1
@@ -385,7 +385,7 @@ def main():
             if Current_Grid[y][x] > 0 and Current_Grid[y][x] < valPlayer:
                 Current_Grid[y][x] = 9999
             counter += 1
-        print(Current_Grid)
+        #print(Current_Grid)
 
     click = 0
     pr = 0
@@ -550,5 +550,5 @@ def main():
 
 main()
 
-print(Current_Grid)
+#print(Current_Grid)
 pygame.quit()
