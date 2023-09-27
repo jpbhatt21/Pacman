@@ -4,103 +4,180 @@ import time
 from random import randint
 import math
 
-map = 0
+map = 1
 fps=60
 showDistGrid = 0
-Ghost1 = 0
-Ghost2 = 0 
+Ghost1 = 1
+Ghost2 = 0
 blocker = 0
 showPath =0
-follow = 0
+moved=0
+total=999
+follow = 1
 global caught
 caught=[0,0]
 time_clk=0
-
-
 if map!=0:
     xGrid =19
     yGrid = 25
 else:
-    xGrid = 19  # 19
+    xGrid = 39  # 19
     yGrid = 25  # 25
 height = yGrid * 40
 width = xGrid * 40
-valPlayer = 9998
+valPlayer = 9000
 pygame.init()
 widthBlock = width // xGrid
+Grid = [[9999 for i in range(xGrid)] for j in range(yGrid)]
+pGrid = [[0 for i in range(xGrid)] for j in range(yGrid)]
 
-Current_Grid = [[9999 for i in range(xGrid)] for j in range(yGrid)]
-if map == 1:
-    Current_Grid = [[-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2],
-        [-2,10,11,12,11,10,9,8,7,8,8,9,10,11,12,13,12,11,-2],[-2,9,-2,-2,-2,-2,-2,-2,6,-2,7,-2,-2,-2,-2,-2,-2,10,-2],
-        [-2,8,7,6,5,-2,3,4,5,-2,6,5,4,-2,6,7,8,9,-2],[-2,-2,8,-2,4,-2,2,-2,-2,-2,-2,-2,3,-2,5,-2,9,-2,-2],
-        [-2,7,8,-2,3,2,1,1,1,1,1,1,2,3,4,-2,8,7,-2],[-2,6,-2,-2,3,-2,-2,-2,1,-2,2,-2,-2,-2,3,-2,-2,6,-2],
-        [-2,5,4,3,2,1,1,1,1,-2,3,4,5,5,4,3,4,5,-2],[-2,-2,-2,-2,3,-2,1,-2,-2,-2,-2,-2,4,-2,3,-2,-2,-2,-2],
-        [9999,9999,9999,-2,4,-2,1,1,1,1,1,2,3,-2,4,-2,9999,9999,9999],
-        [-2,-2,-2,-2,5,-2,1,-2,-2,1,-2,-2,4,-2,5,-2,-2,-2,-2,-2],[8,7,6,5,4,3,2,-2,1,1,1,-2,5,4,4,5,6,7,8],
-        [9,8,7,6,5,4,3,-2,1,1,1,-2,4,3,4,5,6,7,8],[9,9,8,7,6,5,4,-2,1,0,9000,-2,3,3,4,5,6,7,8],
-        [-2,-2,-2,-2,7,-2,5,-2,-2,-2,-2,-2,2,-2,5,-2,-2,-2,-2,-2],
-        [9999,9999,9999,-2,8,-2,5,6,5,4,3,2,3,-2,6,-2,9999,9999,9999],
-        [-2,-2,-2,-2,9,-2,6,-2,-2,-2,-2,-2,4,-2,7,-2,-2,-2,-2],[-2,12,11,10,9,8,7,8,9,-2,7,6,5,6,7,8,9,10,-2],
-        [-2,13,-2,-2,10,-2,-2,-2,10,-2,8,-2,-2,-2,8,-2,-2,11,-2],
-        [-2,14,15,-2,11,12,13,12,11,10,9,10,11,10,9,-2,13,12,-2],
-        [-2,-2,9999,-2,12,-2,14,-2,-2,-2,-2,-2,12,-2,10,-2,14,-2,-2],
-        [-2,9999,15,14,13,-2,15,9999,9999,-2,15,14,13,-2,11,12,13,14,-2],
-        [-2,9999,-2,-2,-2,-2,-2,-2,9999,-2,9999,-2,-2,-2,-2,-2,-2,15,-2],
-        [-2,9999,9999,9999,9999,9999,9999,9999,9999,9999,9999,9999,9999,9999,9999,9999,9999,9999,-2],
-        [-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2,-2]]
-elif map == 2:
-    Current_Grid = [[9999, 9999, 9999, 9999, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, 9999, 9999, 9999, 9999], [9999, 9999, 9999, 9999, -2, 9999, 9999, 9999, 9999, 9998, 9999, 9999, 9999, 9999, -2, 9999, 9999, 9999, 9999], [9999, 9999, 9999, 9999, -2, 9999, -2, 9999, -2, -2, -2, 9999, -2, 9999, -2, 9999, 9999, 9999, 9999], [9999, 9999, 9999, 9999, -2, 9999, -2, 9999, 9999, -2, 9999, 9999, -2, 9999, -2, 9999, 9999, 9999, 9999], [-2, -2, -2, -2, -2, 9999, -2, -2, 9999, -2, 9999, -2, -2, 9999, -2, -2, -2, -2, -2], [9999, 9999, 9999, 9999, 9999, 9999, -2, 9999, 9999, 9999, 9999, 9999, -2, 9999, 9999, 9999, 9999, 9999, 9999], [-2, -2, 9999, -2, -2, -2, -2, 9999, -2, -2, -2, 9999, -2, -2, -2, -2, 9999, -2, -2], [-2, 9999, 9999, 9999, 9999, 9999, -2, 9999, 9999, -2, 9999, 9999, -2, 9999, 9999, 9999, 9999, 9999, -2], [-2, 9999, -2, -2, -2, 9999, -2, -2, 9999, -2, 9999, -2, -2, 9999, -2, -2, -2, 9999, -2], [-2, 9999, 9999, 9999, -2, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, -2, 9999, 9999, 9999, -2], [-2, -2, -2, 9999, -2, -2, 9999, -2, -2, 9999, -2, -2, 9999, -2, -2, 9999, -2, -2, -2], [9999, 9999, 9999, 9999, 9999, 9999, 9999, -2, 9999, 9999, 9999, -2, 9999, 9999, 9999, 9999, 9999, 9999, 9999], [-2, -2, 9999, -2, -2, -2, 9999, -2, 9999, 0, 9999, -2, 9999, -2, -2, -2, 9999, -2, -2], [-2, -2, 9999, 9999, 9999, 9999, 9999, -2, 9999, 9999, 9999, -2, 9999, 9999, 9999, 9999, 9999, -2, -2], [-2, -2, 9999, -2, 9999, -2, 9999, -2, -2, -2, -2, -2, 9999, -2, 9999, -2, 9999, -2, -2], [-2, -2, 9999, -2, 9999, -2, 9999, 9999, 9999, 9999, 9999, 9999, 9999, -2, 9999, -2, 9999, -2, -2], [-2, -2, 9999, -2, 9999, -2, 9999, -2, -2, -2, -2, -2, 9999, -2, 9999, -2, 9999, -2, -2], [9999, 9999, 9999, -2, 9999, -2, 9999, 9999, 9999, -2, 9999, 9999, 9999, -2, 9999, -2, 9999, 9999, 9999], [-2, -2, -2, -2, 9999, -2, -2, -2, 9999, -2, 9999, -2, -2, -2, 9999, -2, -2, -2, -2], [-2, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, -2], [-2, 9999, -2, 9999, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, 9999, -2, 9999, -2], [-2, 9999, -2, 9999, -2, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, -2, 9999, -2, 9999, -2], [-2, 9999, -2, 9999, -2, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, -2, 9999, -2, 9999, -2], [-2, 9999, 9999, 9999, -2, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, -2, 9999, 9999, 9999, -2], [-2, -2, -2, -2, -2, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, -2, -2, -2, -2, -2]]
-
-
-y = 0
-if blocker > 0:
-    y = 0
-    while y < yGrid and blocker > 1:
-        x = 0
-        while x < xGrid:
-            if y == 0 or x == 0 or y == yGrid - 1 or x == xGrid - 1:
-                Current_Grid[y][x] = -2
-            x += 1
-        y += 1
-    y = 0
-    while y < yGrid and blocker % 2 == 1:
-        Current_Grid[y][xGrid // 2] = -2
-        y += 1
-counter = 0
-while counter < (xGrid * yGrid):
-    x = counter // xGrid
-    y = counter % xGrid
-    if Current_Grid[x][y] != -2:
-        Current_Grid[x][y] = 9999
-    counter += 1
-
-xPlayerStart = xGrid//2
-yPlayerStart = 1
-
-xGhost1Start = xGrid//2
-yGhost1Start = yGrid//2
-
-xGhost2Start = xGrid//2-1
-yGhost2Start = yGrid//2
-
-Current_Grid[yGhost1Start][xGhost1Start] = 0
-Current_Grid[yGhost2Start][xGhost2Start] = 9999 - Ghost2 * 10000
-Current_Grid[yPlayerStart][xPlayerStart] = valPlayer
-
+def InitMap():
+    global Grid,map
+    map=randint(0,5)+1
+    if map == 1:
+        print("in 1")
+        Grid = [[-2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2], 
+    [-2, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, -2], 
+    [-2, 9999, -2, -2, -2, -2, -2, -2, 9999, -2, 9999, -2, -2, -2, -2, -2, -2, 9999, -2],
+    [-2, 9999, 9999, 9999, 9999, -2, 9999, 9999, 9999, -2, 9999, 9999, 9999, -2, 9999, 9999, 9999, 9999, -2],
+    [-2, -2, 9999, -2, 9999, -2, 9999, -2, -2, -2, -2, -2, 9999, -2, 9999, -2, 9999, -2, -2], 
+    [-2, 9999, 9999, -2, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, -2, 9999, 9999, -2],
+    [-2, 9999, -2, -2, 9999, -2, -2, -2, 9999, -2, 9999, -2, -2, -2, 9999, -2, -2, 9999, -2], 
+    [-2, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, -2, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, -2], 
+    [-2, -2, -2, -2, 9999, -2, 9999, -2, -2, -2, -2, -2, 9999, -2, 9999, -2, -2, -2, -2], 
+    [9998, 9998, 9998, -2, 9999, -2, 9999, 9999, 9999, 9999, 9999, 9999, 9999, -2, 9999, -2, 9998, 9998, 9998], 
+    [-2, -2, -2, -2, 9999, -2, 9999, -2, -2, 9998, -2, -2, 9999, -2, 9999, -2, -2, -2, -2, -2], 
+    [9999, 9999, 9999, 9999, 9999, 9999, 9999, -2, 9998, 9998, 9998, -2, 9999, 9999, 9999, 9999, 9999, 9999, 9999], 
+    [9999, 9999, 9999, 9999, 9999, 9999, 9999, -2, 9998, 0, 9998, -2, 9999, 9999, 9999, 9999, 9999, 9999, 9999], 
+    [9999, 9999, 9999, 9999, 9999, 9999, 9999, -2, 9998, 9998, 9998, -2, 9999, 9999, 9999, 9999, 9999, 9999, 9999], 
+    [-2, -2, -2, -2, 9999, -2, 9999, -2, -2, -2, -2, -2, 9999, -2, 9999, -2, -2, -2, -2, -2], 
+    [9998, 9998, 9998, -2, 9999, -2, 9999, 9999, 9999, 9999, 9999, 9999, 9999, -2, 9999, -2, 9998, 9998, 9998], 
+    [-2, -2, -2, -2, 9999, -2, 9999, -2, -2, -2, -2, -2, 9999, -2, 9999, -2, -2, -2, -2], 
+    [-2, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, -2, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, -2],
+    [-2, 9999, -2, -2, 9999, -2, -2, -2, 9999, -2, 9999, -2, -2, -2, 9999, -2, -2, 9999, -2],
+    [-2, 9999, 9999, -2, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, -2, 9999, 9999, -2],
+    [-2, -2, 9999, -2, 9999, -2, 9999, -2, -2, -2, -2, -2, 9999, -2, 9999, -2, 9999, -2, -2],
+    [-2, 9999, 9999, 9999, 9999, -2, 9999, 9999, 9999, -2, 9999, 9999, 9999, -2, 9999, 9999, 9999, 9999, -2], 
+    [-2, 9999, -2, -2, -2, -2, -2, -2, 9999, -2, 9999, -2, -2, -2, -2, -2, -2, 9999, -2], 
+    [-2, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, -2],
+    [-2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2]]
+    elif map == 2:
+        print("in 2")
+        Grid = [[-2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2], [-2, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, -2], [-2, 9999, 9999, -2, 9999, 9999, 9999, -2, -2, -2, -2, -2, 9999, -2, 9999, 9999, 9999, 9999, -2], [-2, 9999, -2, -2, -2, 9999, 9999, -2, 9999, 9999, 9999, -2, 9999, -2, 9999, -2, 9999, 9999, -2], [9999, 9999, 9999, -2, 9999, 9999, 9999, -2, 9999, 9999, 9999, -2, 9999, 9999, 9999, -2, 9999, 9999, 9999], [9999, 9999, 9999, 9999, 9999, 9999, 9999, -2, 9999, 9999, 9999, -2, 9999, 9999, 9999, -2, 9999, 9999, 9999], [-2, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, -2, 9999, -2, 9999, 9999, -2], [-2, 9999, 9999, -2, 9999, 9999, 9999, -2, 9999, 9999, 9999, 9999, 9999, -2, 9999, -2, 9999, -2, -2], [9999, 9999, 9999, -2, 9999, -2, -2, -2, 9999, 9999, -2, -2, -2, -2, -2, -2, 9999, 9999, -2], [9999, 9999, 9999, -2, 9999, -2, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, -2, 9999, 9999, 9999], [-2, 9999, 9999, -2, 9999, -2, 9999, -2, -2, -2, -2, -2, 9999, 9999, 9999, -2, 9999, 9999, 9999, -2], [-2, 9999, 9999, 9999, 9999, 9999, 9999, -2, 9999, 1, 9999, -2, 9999, 9999, 9999, -2, 9999, 9999, -2], [-2, -2, -2, -2, -2, 9999, 9999, 9999, 9999, 0, 9999, 9999, 9999, -2, 9999, -2, -2, 9999, -2], [-2, 9999, 9999, 9999, 9999, 9999, 9999, -2, 9999, 1, 9999, -2, 9999, -2, 9999, -2, 9999, 9999, -2], [-2, 9999, 9999, 9999, -2, 9999, 9999, -2, -2, -2, -2, -2, 9999, -2, 9999, -2, 9999, 9999, -2, -2], [9999, 9999, -2, -2, -2, -2, 9999, 9999, 9999, -2, 9999, 9999, 9999, -2, 9999, -2, 9999, 9999, 9999], [-2, 9999, -2, 9999, 9999, 9999, 9999, 9999, 9999, -2, 9999, 9999, 9999, 9999, 9999, -2, 9999, 9999, -2], [-2, 9999, 9999, 9999, 9999, -2, 9999, -2, -2, -2, -2, -2, 9999, 9999, 9999, -2, 9999, 9999, -2], [-2, -2, -2, 9999, 9999, -2, 9999, -2, 9999, 9999, 9999, -2, 9999, 9999, 9999, -2, 9999, 9999, -2], [9999, 9999, 9999, 9999, 9999, -2, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, -2, 9999, 9999, 9999], [9999, 9999, 9999, 9999, -2, -2, 9999, -2, -2, 9999, -2, -2, 9999, -2, -2, -2, 9999, 9999, 9999], [-2, 9999, 9999, -2, -2, -2, 9999, -2, 9999, 9999, 9999, -2, 9999, 9999, 9999, -2, -2, -2, -2], [9999, 9999, 9999, 9999, 9999, 9999, 9999, -2, 9999, -2, 9999, -2, 9999, 9999, 9999, 9999, 9999, -2, 9999], [9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, -2, 9999, 9999, 9999], [-2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2]]
+    elif map==3:
+        print("in 3")
+        Grid=[ 
+        [ -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2],
+        [ -2, 9999, 9999, 9999, 9999, 9999, -2, 9999, 9999, 9999, 9999, 9999, -2, 9999, 9999, 9999, 9999, 9999, -2],
+        [ -2, 9999, -2, -2, -2, 9999, -2, 9999, -2, -2, -2, 9999, -2, 9999, -2, -2, -2, 9999, -2],
+        [ -2, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, -2],
+        [ -2, -2, 9999, -2, 9999, -2, -2, -2, 9999, -2, 9999, -2, -2, -2, 9999, -2, 9999, -2, -2],
+        [ 9998, -2, 9999, -2, 9999, -2, -2, -2, 9999, -2, 9999, -2, -2, -2, 9999, -2, 9999, -2, 9998],
+        [ -2, -2, 9999, -2, 9999, -2, -2, -2, 9999, -2, 9999, -2, -2, -2, 9999, -2, 9999, -2, -2],
+        [ 9999, 9999, 9999, -2, 9999, 9999, 9999, 9999, 9999, -2, 9999, 9999, 9999, 9999, 9999, -2, 9999, 9999, 9999],
+        [ -2, -2, 9999, -2, -2, -2, 9999, -2, -2, -2, -2, -2, 9999, -2, -2, -2, 9999, -2, -2],
+        [ 9998, -2, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9998, -2, 9998],
+        [ 9998, -2, 9999, -2, -2, -2, 9999, -2, -2, 9998, -2, -2, 9999, -2, -2, -2, 9999, -2, 9998],
+        [ 9998, -2, 9999, -2, 9999, 9999, 9999, -2, 9998, 9998, 9998, -2, 9999, 9999, 9999, -2, 9999, -2, 9998],
+        [ 9998, -2, 9999, -2, 9999, -2, 9999, -2, 9998, 0, 9998, -2, 9999, -2, 9999, -2, 9999, -2, 9998],
+        [ 9998, -2, 9999, -2, 9999, -2, 9999, -2, 9998, 9998, 9998, -2, 9999, -2, 9999, -2, 9999, -2, 9998],
+        [ -2, -2, 9999, -2, 9999, -2, 9999, -2, -2, -2, -2, -2, 9999, -2, 9999, -2, 9999, -2, -2],
+        [ 9999, 9999, 9999, 9999, 9999, -2, 9999, 9999, 9999, 9999, 9999, 9999, 9999, -2, 9999, 9999, 9999, 9999, 9999],
+        [ -2, -2, 9999, -2, -2, -2, -2, -2, 9999, -2, 9999, -2, -2, -2, -2, -2, 9999, -2, -2],
+        [ 9998, -2, 9999, 9999, 9999, 9999, 9999, 9999, 9999, -2, 9999, 9999, 9999, 9999, 9999, 9999, 9999, -2, 9998],
+        [ -2, -2, 9999, -2, -2, -2, 9999, -2, -2, -2, -2, -2, 9999, -2, -2, -2, 9999, -2, -2],
+        [ -2, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, -2],
+        [ -2, 9999, -2, -2, 9999, -2, -2, -2, 9999, -2, 9999, -2, -2, -2, 9999, -2, -2, 9999, -2],
+        [ -2, 9999, -2, -2, 9999, -2, 9999, 9999, 9999, -2, 9999, 9999, 9999, -2, 9999, -2, -2, 9999, -2],
+        [ -2, 9999, -2, -2, 9999, -2, 9999, -2, -2, -2, -2, -2, 9999, -2, 9999, -2, -2, 9999, -2],
+        [ -2, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, -2],
+        [ -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2]]
+    elif map==4:
+        Grid=[ [ -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2],
+        [ 9999, 9999, 9999, 9999, 9999, -2, 9999, 9999, 9999, 9999, 9999, 9999, 9999, -2, 9999, 9999, 9999, 9999, 9999],
+        [ -2, -2, -2, -2, 9999, -2, 9999, -2, -2, -2, -2, -2, 9999, -2, 9999, -2, -2, -2, -2],
+        [ -2, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, -2, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, -2],
+        [ -2, 9999, -2, -2, -2, -2, 9999, -2, 9999, -2, 9999, -2, 9999, -2, -2, -2, -2, 9999, -2],
+        [ -2, 9999, -2, 9999, 9999, 9999, 9999, -2, 9999, -2, 9999, -2, 9999, 9999, 9999, 9999, -2, 9999, -2],
+        [ -2, 9999, -2, 9999, -2, -2, 9999, -2, 9999, 9999, 9999, -2, 9999, -2, -2, 9999, -2, 9999, -2],
+        [ -2, 9999, 9999, 9999, 9999, -2, 9999, -2, -2, -2, -2, -2, 9999, -2, 9999, 9999, 9999, 9999, -2],
+        [ -2, -2, -2, -2, 9999, -2, 9999, 9999, 9999, 9999, 9999, 9999, 9999, -2, 9999, -2, -2, -2, -2],
+        [ -2, 9999, 9999, 9999, 9999, -2, 9999, -2, -2, 9998, -2, -2, 9999, -2, 9999, 9999, 9999, 9999, -2],
+        [ -2, 9999, -2, -2, 9999, -2, 9999, -2, 9998, 9998, 9998, -2, 9999, -2, 9999, -2, -2, 9999, -2],
+        [ -2, 9999, 9999, -2, 9999, -2, 9999, -2, 9998, 0, 9998, -2, 9999, -2, 9999, -2, 9999, 9999, -2],
+        [ -2, -2, 9999, -2, 9999, 9999, 9999, -2, 9998, 9998, 9998, -2, 9999, 9999, 9999, -2, 9999, -2, -2],
+        [ 9998, -2, 9999, -2, 9999, -2, 9999, -2, -2, -2, -2, -2, 9999, -2, 9999, -2, 9999, -2, 9998],
+        [ 9998, -2, 9999, -2, 9999, -2, 9999, 9999, 9999, 9999, 9999, 9999, 9999, -2, 9999, -2, 9999, -2, 9998],
+        [ 9998, -2, 9999, 9999, 9999, -2, -2, -2, 9999, -2, 9999, -2, -2, -2, 9999, 9999, 9999, -2, 9998],
+        [ 9998, -2, 9999, 9999, 9999, 9999, 9999, 9999, 9999, -2, 9999, 9999, 9999, 9999, 9999, 9999, 9999, -2, 9998],
+        [ -2, -2, 9999, -2, -2, -2, -2, -2, 9999, -2, 9999, -2, -2, -2, -2, -2, 9999, -2, -2],
+        [ 9999, 9999, 9999, 9999, 9999, -2, 9999, 9999, 9999, -2, 9999, 9999, 9999, -2, 9999, 9999, 9999, 9999, 9999],
+        [ -2, -2, 9999, -2, 9999, -2, 9999, 9999, 9999, 9999, 9999, 9999, 9999, -2, 9999, -2, 9999, -2, -2],
+        [ -2, 9999, 9999, -2, 9999, -2, 9999, -2, -2, -2, -2, -2, 9999, -2, 9999, -2, 9999, 9999, -2],
+        [ -2, 9999, 9999, -2, 9999, 9999, 9999, 9999, 9999, -2, 9999, 9999, 9999, 9999, 9999, -2, 9999, 9999, -2],
+        [ -2, 9999, -2, -2, 9999, -2, -2, -2, 9999, -2, 9999, -2, -2, -2, 9999, -2, -2, 9999, -2],
+        [ -2, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, -2],
+        [ -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2]]
+    else:
+        Grid=[ [ -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2],
+        [ -2, 9999, 9999, 9999, 9999, 9999, 9999, -2, 9999, 9999, 9999, -2, 9999, 9999, 9999, 9999, 9999, 9999, -2],
+        [ -2, 9999, -2, -2, -2, -2, 9999, -2, 9999, -2, 9999, -2, 9999, -2, -2, -2, -2, 9999, -2],
+        [ -2, 9999, -2, 9999, 9999, 9999, 9999, 9999, 9999, -2, 9999, 9999, 9999, 9999, 9999, 9999, -2, 9999, -2],
+        [ -2, 9999, -2, 9999, -2, 9999, -2, -2, 9999, -2, 9999, -2, -2, 9999, -2, 9999, -2, 9999, -2],
+        [ -2, 9999, 9999, 9999, -2, 9999, -2, -2, 9999, -2, 9999, -2, -2, 9999, -2, 9999, 9999, 9999, -2],
+        [ -2, -2, -2, 9999, -2, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, -2, 9999, -2, -2, -2],
+        [ 9999, 9999, 9999, 9999, -2, -2, -2, 9999, -2, -2, -2, 9999, -2, -2, -2, 9999, 9999, 9999, 9999],
+        [ -2, 9999, -2, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, -2, 9999, -2],
+        [ -2, 9999, -2, -2, 9999, -2, 9999, -2, -2, 9998, -2, -2, 9999, -2, 9999, -2, -2, 9999, -2],
+        [ -2, 9999, -2, 9999, 9999, -2, 9999, -2, 9998, 9998, 9998, -2, 9999, -2, 9999, 9999, -2, 9999, -2],
+        [ -2, 9999, -2, 9999, -2, -2, 9999, -2, 9998, 0, 9998, -2, 9999, -2, -2, 9999, -2, 9999, -2],
+        [ -2, 9999, 9999, 9999, 9999, -2, 9999, -2, 9998, 9998, 9998, -2, 9999, -2, 9999, 9999, 9999, 9999, -2],
+        [ -2, 9999, -2, 9999, -2, -2, 9999, -2, -2, -2, -2, -2, 9999, -2, -2, 9999, -2, 9999, -2],
+        [ -2, 9999, -2, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, -2, 9999, -2],
+        [ -2, 9999, -2, -2, 9999, -2, -2, -2, 9999, -2, 9999, -2, -2, -2, 9999, -2, -2, 9999, -2],
+        [ -2, 9999, 9999, 9999, 9999, -2, -2, 9999, 9999, -2, 9999, 9999, -2, -2, 9999, 9999, 9999, 9999, -2],
+        [ -2, -2, 9999, -2, 9999, -2, 9999, 9999, -2, -2, -2, 9999, 9999, -2, 9999, -2, 9999, -2, -2],
+        [ -2, 9999, 9999, -2, 9999, -2, 9999, -2, -2, -2, -2, -2, 9999, -2, 9999, -2, 9999, 9999, -2],
+        [ -2, 9999, 9999, -2, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, 9999, -2, 9999, 9999, -2],
+        [ -2, 9999, -2, -2, 9999, 9999, -2, -2, 9999, -2, 9999, -2, -2, 9999, 9999, -2, -2, 9999, -2],
+        [ -2, 9999, 9999, 9999, 9999, 9999, -2, 9999, 9999, -2, 9999, 9999, -2, 9999, 9999, 9999, 9999, 9999, -2],
+        [ -2, 9999, -2, -2, -2, 9999, -2, 9999, -2, -2, -2, 9999, -2, 9999, -2, -2, -2, 9999, -2],
+        [ -2, 9999, 9999, 9999, 9999, 9999, -2, 9999, 9999, 9999, 9999, 9999, -2, 9999, 9999, 9999, 9999, 9999, -2],
+        [ -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2]]
+InitMap()
+def playerInit():
+    p=[randint(0,yGrid-1),randint(0,xGrid-1)]    
+    if(Grid[p[0]][p[1]]==9999 and (p[0]<9 or p[1]<6 or (p[1]>12)or p[0]>14)):
+        Grid[p[0]][p[1]]=valPlayer
+    else:
+        p=playerInit()
+    return(p)
+playerInit()
+def pointsinit():
+    global total,pGrid
+    total=0
+    for i in range (yGrid):
+        for j in range(xGrid):
+            pGrid[i][j]=Grid[i][j]
+            if(pGrid[i][j]==9999):
+                total+=1
+pointsinit()
+    
+    
 follow2 = 0
 if follow == 0:
     follow2 = 1
-
+print("Test 2")
 w = pygame.display.set_mode((width,height))
 
 
 def main():
+    print("Test 3")
     counter = 0
     while counter < (xGrid * yGrid):
         x = counter // xGrid
         y = counter % xGrid
-        if Current_Grid[x][y] == valPlayer:
+        if Grid[x][y] == valPlayer:
             break
         counter += 1
     yPlayer = x
@@ -110,7 +187,7 @@ def main():
     while counter < (xGrid * yGrid):
         y = counter // xGrid
         x = counter % xGrid
-        if Current_Grid[y][x] == 0:
+        if Grid[y][x] == 0:
             break
         counter += 1
     yGhost = y
@@ -137,27 +214,27 @@ def main():
         while counter < (xGrid * yGrid):
             y = counter // xGrid
             x = counter % xGrid
-            if Current_Grid[y][x] == valPlayer:
+            if Grid[y][x] == valPlayer:
                 break
             counter += 1
 
         while dist > 0:
-            if x > 0 and Current_Grid[y][x - 1] == dist:
+            if x > 0 and Grid[y][x - 1] == dist:
                 x -= 1
 
-            elif x == 0 and Current_Grid[y][xGrid - 1] == dist:
+            elif x == 0 and Grid[y][xGrid - 1] == dist:
                 x = xGrid - 1
 
-            elif y > 0 and Current_Grid[y - 1][x] == dist:
+            elif y > 0 and Grid[y - 1][x] == dist:
                 y -= 1
 
-            elif y == 0 and Current_Grid[yGrid - 1][x] == dist:
+            elif y == 0 and Grid[yGrid - 1][x] == dist:
                 y = yGrid - 1
 
-            elif x < xGrid and Current_Grid[y][(x + 1) % xGrid] == dist:
+            elif x < xGrid and Grid[y][(x + 1) % xGrid] == dist:
                 x = (x + 1) % xGrid
 
-            elif y < yGrid - 1 and Current_Grid[(y + 1) % yGrid][x] == dist:
+            elif y < yGrid - 1 and Grid[(y + 1) % yGrid][x] == dist:
                 y = (y + 1) % yGrid
 
             if showPath == 1:
@@ -171,13 +248,13 @@ def main():
 
             if dist == 1 and moveGh0st == 1 and (
                     (abs(yGhost - y) + 1) % xGrid < 3 and (abs(xGhost - x) + 1) % xGrid < 3):
-                Current_Grid[yGhost][xGhost] = 9999
+                Grid[yGhost][xGhost] = 9999
                 yGhost = y
                 xGhost = x
-                Current_Grid[yGhost][xGhost] = valGhost
+                Grid[yGhost][xGhost] = valGhost
 
             else:
-                Current_Grid[y][x] = 9999
+                Grid[y][x] = 9999
 
             dist -= 1
 
@@ -191,7 +268,7 @@ def main():
         while counter < (xGrid * yGrid):
             y = counter // xGrid
             x = counter % xGrid
-            if Current_Grid[y][x] == valPlayer:
+            if Grid[y][x] == valPlayer:
                 break
             counter += 1
 
@@ -207,14 +284,14 @@ def main():
                 else:
                     col = 5 * dist
 
-                if Current_Grid[y2][x2] == dist:
-                    if Current_Grid[y2][x2 - 1] > dist:
-                        if Current_Grid[y2][x2 - 1] == valPlayer:
+                if Grid[y2][x2] == dist:
+                    if Grid[y2][x2 - 1] > dist:
+                        if Grid[y2][x2 - 1] == valPlayer:
                             run = False
                             found = 1
 
                         else:
-                            Current_Grid[y2][x2 - 1] = dist + 1
+                            Grid[y2][x2 - 1] = dist + 1
 
                             if showDistGrid == 1:
                                 pygame.draw.rect(w,(255 - col,255 - col,col),(
@@ -224,13 +301,13 @@ def main():
                                 trex.topleft = (x2 * widthBlock - widthBlock,y2 * widthBlock)
                                 w.blit(text,trex)
 
-                    if y2 > 0 and Current_Grid[y2 - 1][x2] > dist:
-                        if Current_Grid[y2 - 1][x2] == valPlayer:
+                    if y2 > 0 and Grid[y2 - 1][x2] > dist:
+                        if Grid[y2 - 1][x2] == valPlayer:
                             run = False
                             found = 1
 
                         else:
-                            Current_Grid[y2 - 1][x2] = dist + 1
+                            Grid[y2 - 1][x2] = dist + 1
 
                             if showDistGrid == 1:
                                 pygame.draw.rect(w,(255 - col,255 - col,col),(
@@ -240,13 +317,13 @@ def main():
                                 trex.topleft = (x2 * widthBlock,y2 * widthBlock - widthBlock)
                                 w.blit(text,trex)
 
-                    if Current_Grid[y2][(x2 + 1) % xGrid] > dist:
-                        if Current_Grid[y2][(x2 + 1) % xGrid] == valPlayer:
+                    if Grid[y2][(x2 + 1) % xGrid] > dist:
+                        if Grid[y2][(x2 + 1) % xGrid] == valPlayer:
                             run = False
                             found = 1
 
                         else:
-                            Current_Grid[y2][(x2 + 1) % xGrid] = dist + 1
+                            Grid[y2][(x2 + 1) % xGrid] = dist + 1
 
                             if showDistGrid == 1:
                                 pygame.draw.rect(w,(255 - col,255 - col,col),(
@@ -256,13 +333,13 @@ def main():
                                 trex.topleft = (x2 * widthBlock + widthBlock,y2 * widthBlock)
                                 w.blit(text,trex)
 
-                    if y2 < yGrid - 1 and Current_Grid[y2 + 1][x2] > dist:
-                        if Current_Grid[y2 + 1][x2] == valPlayer:
+                    if y2 < yGrid - 1 and Grid[y2 + 1][x2] > dist:
+                        if Grid[y2 + 1][x2] == valPlayer:
                             run = False
                             found = 1
 
                         else:
-                            Current_Grid[y2 + 1][x2] = dist + 1
+                            Grid[y2 + 1][x2] = dist + 1
 
                             if showDistGrid == 1:
                                 pygame.draw.rect(w,(255 - col,255 - col,col),(
@@ -279,7 +356,6 @@ def main():
         if Ghost1 == 1:
             if found == 1:
                 grn(dist -1,yGhost,xGhost,moveGhost,0)
-            pygame.draw.rect(w,(170,60,80),(x * widthBlock,y * widthBlock,widthBlock,widthBlock))
             pygame.draw.rect(w,(200,90,50),(xGhost * widthBlock,yGhost * widthBlock,widthBlock,widthBlock))
 
         if Ghost2 == 1:
@@ -293,7 +369,7 @@ def main():
             while counter < (xGrid * yGrid):
                 y = counter // xGrid
                 x = counter % xGrid
-                if Current_Grid[y][x] == -1:
+                if Grid[y][x] == -1:
                     break
                 counter += 1
             yGhost2 = y
@@ -311,13 +387,13 @@ def main():
                 else:
                     col = 5 * dist
 
-                if Current_Grid[y2][x2] == dist - distMani:
-                    if Current_Grid[y2][x2 - 1] > dist:
-                        if Current_Grid[y2][x2 - 1] == valPlayer:
+                if Grid[y2][x2] == dist - distMani:
+                    if Grid[y2][x2 - 1] > dist:
+                        if Grid[y2][x2 - 1] == valPlayer:
                             run = False
                             found = 1
                         else:
-                            Current_Grid[y2][x2 - 1] = dist + 1
+                            Grid[y2][x2 - 1] = dist + 1
                             if showDistGrid == 1:
                                 pygame.draw.rect(w,(255 - col,255 - col,col),(
                                     x2 * widthBlock - widthBlock,y2 * widthBlock,widthBlock,widthBlock))
@@ -326,12 +402,12 @@ def main():
                                 trex = text.get_rect()
                                 trex.topleft = (x2 * widthBlock - widthBlock,y2 * widthBlock)
                                 w.blit(text,trex)
-                    if y2 > 0 and Current_Grid[y2 - 1][x2] > dist:
-                        if Current_Grid[y2 - 1][x2] == valPlayer:
+                    if y2 > 0 and Grid[y2 - 1][x2] > dist:
+                        if Grid[y2 - 1][x2] == valPlayer:
                             run = False
                             found = 1
                         else:
-                            Current_Grid[y2 - 1][x2] = dist + 1
+                            Grid[y2 - 1][x2] = dist + 1
                             if showDistGrid == 1:
                                 pygame.draw.rect(w,(255 - col,255 - col,col),(
                                     x2 * widthBlock,y2 * widthBlock - widthBlock,widthBlock,widthBlock))
@@ -339,12 +415,12 @@ def main():
                                 trex = text.get_rect()
                                 trex.topleft = (x2 * widthBlock,y2 * widthBlock - widthBlock)
                                 w.blit(text,trex)
-                    if Current_Grid[y2][(x2 + 1) % xGrid] > dist:
-                        if Current_Grid[y2][(x2 + 1) % xGrid] == valPlayer:
+                    if Grid[y2][(x2 + 1) % xGrid] > dist:
+                        if Grid[y2][(x2 + 1) % xGrid] == valPlayer:
                             run = False
                             found = 1
                         else:
-                            Current_Grid[y2][(x2 + 1) % xGrid] = dist + 1
+                            Grid[y2][(x2 + 1) % xGrid] = dist + 1
                             if showDistGrid == 1:
                                 pygame.draw.rect(w,(255 - col,255 - col,col),(
                                     x2 * widthBlock + widthBlock,y2 * widthBlock,widthBlock,widthBlock))
@@ -352,12 +428,12 @@ def main():
                                 trex = text.get_rect()
                                 trex.topleft = (x2 * widthBlock + widthBlock,y2 * widthBlock)
                                 w.blit(text,trex)
-                    if y2 < yGrid - 1 and Current_Grid[y2 + 1][x2] > dist:
-                        if Current_Grid[y2 + 1][x2] == valPlayer:
+                    if y2 < yGrid - 1 and Grid[y2 + 1][x2] > dist:
+                        if Grid[y2 + 1][x2] == valPlayer:
                             run = False
                             found = 1
                         else:
-                            Current_Grid[y2 + 1][x2] = dist + 1
+                            Grid[y2 + 1][x2] = dist + 1
                             if showDistGrid == 1:
                                 pygame.draw.rect(w,(255 - col,255 - col,col),(
                                     x2 * widthBlock,y2 * widthBlock + widthBlock,widthBlock,widthBlock))
@@ -375,18 +451,23 @@ def main():
         if found == 1 and Ghost2 == 1:
             grn(dist - 1,yGhost2,xGhost2,moveGhost,-1)
         if Ghost2 == 1:
-            pygame.draw.rect(w,(170,60,80),(x * widthBlock,y * widthBlock,widthBlock,widthBlock))
             pygame.draw.rect(w,(200,90,50),(xGhost2 * widthBlock,yGhost2 * widthBlock,widthBlock,widthBlock))
+        #pygame.draw.rect(w,(170,60,80),(,,widthBlock,widthBlock))
+        global moved
+        if(moved%4>1):
+            pygame.draw.arc(w, (255, 255, 0), (x * widthBlock, y * widthBlock, widthBlock, widthBlock),0.7853981634, 5.4977871438, 30)
+        else:
+            pygame.draw.circle(w, (255, 255, 0), (x * widthBlock+widthBlock//2, y * widthBlock+widthBlock//2), widthBlock//2)
 
     def res():
         counter = 0
         while counter < (xGrid * yGrid):
             y = counter // xGrid
             x = counter % xGrid
-            if Current_Grid[y][x] > 0 and Current_Grid[y][x] < valPlayer:
-                Current_Grid[y][x] = 9999
+            if Grid[y][x] > 0 and Grid[y][x] < valPlayer:
+                Grid[y][x] = 9999
             counter += 1
-        #print(Current_Grid)
+        #print(Grid)
 
     click = 0
     pr = 0
@@ -397,7 +478,7 @@ def main():
     tic = 0
 
     time_clk=0
-    global Ghost2
+    global Ghost2,total,moved
     gh2 = Ghost2
     Ghost2=0
 
@@ -418,7 +499,7 @@ def main():
         while counter < (xGrid * yGrid):
             x = counter // xGrid
             y = counter % xGrid
-            if Current_Grid[x][y] == 0:
+            if Grid[x][y] == 0:
                 break
             counter += 1
         yGhost = x
@@ -426,15 +507,19 @@ def main():
         counter = 0
         yy = 0
         Mouse_Loc = pygame.mouse.get_pos()
+        if total==0:
+            break  
         while counter < (xGrid * yGrid):
             x = counter // xGrid
             y = counter % xGrid
-            if Current_Grid[x][y] == -2:
+            if Grid[x][y] == -2:
                 pygame.draw.rect(w,(20,35,80),(y * widthBlock,x * widthBlock,widthBlock,widthBlock))
             elif (counter % 2 == 0 and yy % 2 == 0) or (counter % 2 != 0 and yy % 2 != 0):
                 pygame.draw.rect(w,(12,15,40),(y * widthBlock,x * widthBlock,widthBlock,widthBlock))
             else:
                 pygame.draw.rect(w,(5,8,15),(y * widthBlock,x * widthBlock,widthBlock,widthBlock))
+            if pGrid[x][y] == 9999:
+                pygame.draw.circle(w,(200,35,80),(y * widthBlock +widthBlock//2,x * widthBlock+widthBlock//2),widthBlock//8)
             counter += 1
 
         keypress = pygame.key.get_pressed()
@@ -445,60 +530,70 @@ def main():
                 pr = 5
             if pr == 0:
                 if counter != yGhost or yy != xGhost:
-                    Current_Grid[yy][counter] = -2
-            elif pr == 1 and Current_Grid[yy][counter] == -2:
-                Current_Grid[yy][counter] = 9999
+                    Grid[yy][counter] = -2
+            elif pr == 1 and Grid[yy][counter] == -2:
+                Grid[yy][counter] = 9999
         if pr == 2:
             yy = Mouse_Loc[1] // widthBlock
             counter = Mouse_Loc[0] // widthBlock % xGrid
-            if Current_Grid[yy][counter] != -2 and Current_Grid[yy][counter] != 0:
-                Current_Grid[yPlayer][xPlayer] = 9999
+            if Grid[yy][counter] != -2 and Grid[yy][counter] != 0:
+                Grid[yPlayer][xPlayer] = 9999
                 yPlayer = yy
                 xPlayer = counter
-                Current_Grid[yPlayer][xPlayer] = valPlayer
+                Grid[yPlayer][xPlayer] = valPlayer
         if pr == 3:
             yy = Mouse_Loc[1] // widthBlock * pv
             counter = Mouse_Loc[0] // widthBlock % xGrid * pv
-            if Current_Grid[yy][counter] != -2 and Current_Grid[yy][counter] != valPlayer:
-                Current_Grid[yGhost][xGhost] = 9999
+            if Grid[yy][counter] != -2 and Grid[yy][counter] != valPlayer:
+                Grid[yGhost][xGhost] = 9999
                 yGhost = yy
                 xGhost = counter
-                Current_Grid[yGhost][xGhost] = 0
+                Grid[yGhost][xGhost] = 0
         if ticker == 0:
             mov3Ghost = 1
         else:
             mov3Ghost = 0
-        if movePlayer == 1 and tic == 0 and Current_Grid[yPlayer + 1][xPlayer] != -2 and Current_Grid[yPlayer + 1][
-            xPlayer] != 0 and Current_Grid[yPlayer + 1][xPlayer] != -1:
+        moved=0
+        if movePlayer == 1 and tic == 0 and Grid[yPlayer + 1][xPlayer] != -2 and Grid[yPlayer + 1][
+            xPlayer] != 0 and Grid[yPlayer + 1][xPlayer] != -1:
             tic = 15
-            Current_Grid[yPlayer][xPlayer] = 9999
+            Grid[yPlayer][xPlayer] = 9999
             yPlayer += 1
-            Current_Grid[yPlayer][xPlayer] = valPlayer
-        elif movePlayer == 2 and tic == 0 and Current_Grid[yPlayer - 1][xPlayer] != -2 and Current_Grid[yPlayer - 1][
-            xPlayer] != 0 and Current_Grid[yPlayer - 1][xPlayer] != -1:
-            Current_Grid[yPlayer][xPlayer] = 9999
+            Grid[yPlayer][xPlayer] = valPlayer
+            moved=1+moved%4
+        elif movePlayer == 2 and tic == 0 and Grid[yPlayer - 1][xPlayer] != -2 and Grid[yPlayer - 1][
+            xPlayer] != 0 and Grid[yPlayer - 1][xPlayer] != -1:
+            Grid[yPlayer][xPlayer] = 9999
             yPlayer -= 1
             tic = 15
-            Current_Grid[yPlayer][xPlayer] = valPlayer
-        elif movePlayer == 3 and tic == 0 and Current_Grid[yPlayer][(xPlayer + 1) % xGrid] != -2 and\
-                Current_Grid[yPlayer][(xPlayer + 1) % xGrid] != 0 and Current_Grid[yPlayer][
+            Grid[yPlayer][xPlayer] = valPlayer
+            moved=5+moved%4
+        elif movePlayer == 3 and tic == 0 and Grid[yPlayer][(xPlayer + 1) % xGrid] != -2 and\
+                Grid[yPlayer][(xPlayer + 1) % xGrid] != 0 and Grid[yPlayer][
             (xPlayer + 1) % xGrid] != -1:
-            Current_Grid[yPlayer][xPlayer] = 9999
+            Grid[yPlayer][xPlayer] = 9999
             xPlayer = (xPlayer + 1) % xGrid
             tic = 15
-            Current_Grid[yPlayer][xPlayer % xGrid] = valPlayer
-        elif movePlayer == 4 and tic == 0 and xPlayer != 0 and Current_Grid[yPlayer][xPlayer - 1] != -2 and\
-                Current_Grid[yPlayer][xPlayer - 1] != 0 and Current_Grid[yPlayer][xPlayer - 1] != -1:
-            Current_Grid[yPlayer][xPlayer] = 9999
+            Grid[yPlayer][xPlayer % xGrid] = valPlayer
+            moved=9+moved%4
+        elif movePlayer == 4 and tic == 0 and xPlayer != 0 and Grid[yPlayer][xPlayer - 1] != -2 and\
+                Grid[yPlayer][xPlayer - 1] != 0 and Grid[yPlayer][xPlayer - 1] != -1:
+            Grid[yPlayer][xPlayer] = 9999
             xPlayer -= 1
             tic = 15
-            Current_Grid[yPlayer][xPlayer] = valPlayer
-        elif movePlayer == 4 and tic == 0 and xPlayer == 0 and Current_Grid[yPlayer][xGrid - 1] != -2 and\
-                Current_Grid[yPlayer][xGrid - 1] != 0 and Current_Grid[yPlayer][xGrid - 1] != -1:
-            Current_Grid[yPlayer][xPlayer] = 9999
+            Grid[yPlayer][xPlayer] = valPlayer
+            moved=13+moved%4
+        elif movePlayer == 4 and tic == 0 and xPlayer == 0 and Grid[yPlayer][xGrid - 1] != -2 and\
+                Grid[yPlayer][xGrid - 1] != 0 and Grid[yPlayer][xGrid - 1] != -1:
+            Grid[yPlayer][xPlayer] = 9999
             xPlayer = xGrid - 1
             tic = 15
-            Current_Grid[yPlayer][xPlayer] = valPlayer
+            Grid[yPlayer][xPlayer] = valPlayer
+            moved=13+moved%4
+        if(moved>0):
+            if pGrid[yPlayer][xPlayer]==9999:
+                pGrid[yPlayer][xPlayer]=0
+                total-=1
         if caught[0] > 20 or caught[1] > 20:
             run = False
 
@@ -526,17 +621,17 @@ def main():
                 pr = 0
                 mov3Ghost = 0
 
-            if keypress[pygame.K_s] and Current_Grid[yPlayer + 1][xPlayer] != -2 and Current_Grid[yPlayer + 1][
-                xPlayer] != 0 and Current_Grid[yPlayer + 1][xPlayer] != -1:
+            if keypress[pygame.K_s] and Grid[yPlayer + 1][xPlayer] != -2 and Grid[yPlayer + 1][
+                xPlayer] != 0 and Grid[yPlayer + 1][xPlayer] != -1:
                 movePlayer = 1
-            elif keypress[pygame.K_w] and Current_Grid[yPlayer - 1][xPlayer] != -2 and Current_Grid[yPlayer - 1][
-                xPlayer] != 0 and Current_Grid[yPlayer - 1][xPlayer] != -1:
+            elif keypress[pygame.K_w] and Grid[yPlayer - 1][xPlayer] != -2 and Grid[yPlayer - 1][
+                xPlayer] != 0 and Grid[yPlayer - 1][xPlayer] != -1:
                 movePlayer = 2
-            elif keypress[pygame.K_d] and Current_Grid[yPlayer][(xPlayer + 1) % xGrid] != -2 and Current_Grid[yPlayer][
-                (xPlayer + 1) % xGrid] != 0 and Current_Grid[yPlayer][(xPlayer + 1) % xGrid] != -1:
+            elif keypress[pygame.K_d] and Grid[yPlayer][(xPlayer + 1) % xGrid] != -2 and Grid[yPlayer][
+                (xPlayer + 1) % xGrid] != 0 and Grid[yPlayer][(xPlayer + 1) % xGrid] != -1:
                 movePlayer = 3
-            elif keypress[pygame.K_a] and Current_Grid[yPlayer][xPlayer - 1] != -2 and Current_Grid[yPlayer][
-                xPlayer - 1] != 0 and Current_Grid[yPlayer][xPlayer - 1] != -1:
+            elif keypress[pygame.K_a] and Grid[yPlayer][xPlayer - 1] != -2 and Grid[yPlayer][
+                xPlayer - 1] != 0 and Grid[yPlayer][xPlayer - 1] != -1:
                 movePlayer = 4
             else:
                 movePlayer = 0
@@ -546,10 +641,11 @@ def main():
                 run = False
 
         path(mov3Ghost)
+        
         pygame.display.update()
 	
-
+print("Test 4")
 main()
 
-print(Current_Grid)
+#print(Grid)
 pygame.quit()
